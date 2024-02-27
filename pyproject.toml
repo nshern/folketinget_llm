@@ -11,6 +11,10 @@ llama-index = "^0.10.12"
 streamlit = "^1.31.1"
 
 
+[tool.poetry.group.DEV.dependencies]
+ipython = "^8.22.1"
+bpython = "^0.24"
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
