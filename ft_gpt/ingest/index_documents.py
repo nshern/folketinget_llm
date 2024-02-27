@@ -9,6 +9,13 @@ from llama_index.core import (
 from llama_index.core.node_parser import SimpleNodeParser
 
 
+def parse_nodes(documents):
+    node_parser = SimpleNodeParser.from_defaults(chunk_size=1024)
+    nodes = node_parser.get_nodes_from_documents(documents)
+
+    return nodes
+
+
 def create_index():
     if os.path.isdir(constants.PERSIST_DIR):
         print("Storage exists")
@@ -26,10 +33,3 @@ def create_index():
         index.storage_context.persist(persist_dir=constants.PERSIST_DIR)
 
     return index
-
-
-def parse_nodes(documents):
-    node_parser = SimpleNodeParser.from_defaults(chunk_size=1024)
-    nodes = node_parser.get_nodes_from_documents(documents)
-
-    return nodes

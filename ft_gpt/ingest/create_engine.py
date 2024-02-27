@@ -4,12 +4,12 @@ from ft_gpt.ingest.index_documents import create_index
 
 
 def generate_pre_promt():
-    dates_of_sittings = utils.get_dates_of_sittings()
+    dates_of_sittings = utils.get_dates_of_sittings(reverse=True)
 
     prompt = (
         "You are a helpful chatbot that answers questions about meeting notes (mødereferater) from the Danish Folketing.\n"
         "You should only answer questions related to this topic.\n"
-        "The date today is 24. of February 2024. Every mention of a time and date should be in relation to this piece of information.\n"
+        f"The date today is {utils.get_current_date()}. of February 2024. Every mention of a time and date should be in relation to this piece of information.\n"
         f"You have access to meeting notes from the following dates:\n {dates_of_sittings}\n"
         "You may only communicate in Danish and should refrain entirely from communicating in any other language.\n"
     )
