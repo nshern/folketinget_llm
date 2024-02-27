@@ -3,6 +3,10 @@ import os
 from ft_gpt import constants, utils
 
 
+def get_current_date():
+    return datetime.now().isoformat().split("T")[0]
+
+
 def convert_date(date_str):
     # Parse the date string to a datetime object
     date_obj = datetime.strptime(date_str, "%Y-%m-%d")
@@ -18,7 +22,7 @@ def get_date(s: str):
     return s.split("_")[-2]
 
 
-def get_dates_of_sittings():
+def get_dates_of_sittings(reverse=False):
     dates = []
     files = os.listdir(constants.DATA_DIR)
 
@@ -28,18 +32,14 @@ def get_dates_of_sittings():
         else:
             date_of_sitting = f"{utils.get_date(file)}"
             dates.append(date_of_sitting)
-    # Convert string dates to datetime objects
+
     date_objects = [datetime.strptime(date, "%Y-%m-%d") for date in dates]
 
-    # Sort the date objects
-    date_objects.sort()
+    if reverse is True:
+        date_objects.sort(reverse=True)
+    else:
+        date_objects.sort()
 
-    # If you need them back in string format
     sorted_dates = [datetime.strftime(date, "%Y-%m-%d") for date in date_objects]
-
-    res = []
-
-    for i in sorted_dates:
-        res.append(i)
 
     return sorted_dates
