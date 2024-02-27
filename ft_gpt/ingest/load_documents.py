@@ -4,6 +4,7 @@ from llama_index.core import Document
 
 
 def load_docs():
+    print("Loading documents...")
     """
     Read text files used for the llm
     """
@@ -20,7 +21,7 @@ def load_docs():
         except Exception as e:
             print(f"No date were found for file: {file}: {e}")
             date = ""
-        date_of_sitting = f"Afholdelsestidspunkt for møde: {date}"
+        date_of_sitting = f"[Afholdelsestidspunkt for møde: {date}]"
         with open(f"{data_dir}{file}") as f:
             text = f.read()
         title = file.split(".pdf.txt")[0]
