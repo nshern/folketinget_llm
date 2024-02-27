@@ -7,7 +7,7 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = ">=3.11,<3.12"
-llama-index = "^0.10.12"
+llama-index = "0.10.12"
 streamlit = "^1.31.1"
 
 
