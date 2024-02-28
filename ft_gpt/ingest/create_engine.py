@@ -1,5 +1,6 @@
 from ft_gpt import utils
-from llama_index.core.memory import ChatMemoryBuffer
+
+# from llama_index.core.memory import ChatMemoryBuffer
 from ft_gpt.ingest.index_documents import create_index
 
 
@@ -17,13 +18,23 @@ def generate_pre_promt():
     return prompt
 
 
+# def create_engine():
+#     index = create_index()
+#     memory = ChatMemoryBuffer.from_defaults()
+#     system_prompt = generate_pre_promt()
+#     query_engine = index.as_chat_engine(
+#         chat_mode="context",  # type: ignore
+#         memory=memory,
+#         system_prompt=system_prompt,
+#     )
+#     return query_engine
+
+
 def create_engine():
     index = create_index()
-    memory = ChatMemoryBuffer.from_defaults()
     system_prompt = generate_pre_promt()
     query_engine = index.as_chat_engine(
-        chat_mode="context",  # type: ignore
-        memory=memory,
+        chat_mode="openai",  # type: ignore
         system_prompt=system_prompt,
     )
     return query_engine

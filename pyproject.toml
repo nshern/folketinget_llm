@@ -9,6 +9,7 @@ readme = "README.md"
 python = ">=3.11,<3.12"
 llama-index = "0.10.12"
 streamlit = "^1.31.1"
+watchdog = "^4.0.0"
 
 
 [tool.poetry.group.DEV.dependencies]

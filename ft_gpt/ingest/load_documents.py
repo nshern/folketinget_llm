@@ -24,8 +24,13 @@ def load_docs():
         date_of_sitting = f"[Afholdelsestidspunkt for møde: {date}]"
         with open(f"{data_dir}{file}") as f:
             text = f.read()
+
         title = file.split(".pdf.txt")[0]
-        document = Document(text=text, metadata={"title": title, "date": f"[{date_of_sitting}]"})  # type: ignore
+        if title.startswith("dk_forhandlinger"):
+            url = f"https://www.ft.dk/forhandlinger/{title.split('_', 3)[2]}/{title.split('_', 3)[3]}.htm"
+        else:
+            url = ""
+        document = Document(text=text, metadata={"title": title, "date": f"[{date_of_sitting}]", "url": url})  # type: ignore
         documents.append(document)
 
     return documents
