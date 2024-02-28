@@ -24,20 +24,10 @@ def show_info_text():
     st.markdown("")
 
 
-# reset_button = st.button(label="Nulstil samtalehistorik", type="secondary")
-# if reset_button:
-#     reset_chat()
-
-
 def init_chat():
     st.session_state.messages = []
     st.session_state.chat_engine.reset()
 
-
-#     welcome_message = "Hej. Jeg kan besvare spørgsmål relateret til mødereferater fra Folketinget for møder. Hvad vil du gerne vide?"
-#     st.session_state.messages.append(
-#         {"role": "llm", "content": welcome_message},
-#     )
 
 show_info_text()
 
