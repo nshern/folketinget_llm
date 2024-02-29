@@ -1,10 +1,10 @@
 # app/Dockerfile
-USER root
 # FROM python:3.9-slim
 FROM python:3.11.7-bookworm
 
 WORKDIR /app
 
+USER root
 RUN apt-get update && apt-get install -y \
     build-essential \
     curl \
