@@ -1,11 +1,8 @@
 ---
-title: Folketinget Llm
-emoji: 🐢
-colorFrom: pink
+title: Basic Docker SDK Space
+emoji: 🐳
+colorFrom: purple
 colorTo: gray
-sdk: streamlit
-sdk_version: 1.31.1
-app_file: app.py
-pinned: false
-license: mit
+sdk: docker
+app_port: 8501
 ---
