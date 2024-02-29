@@ -1,4 +1,5 @@
 # app/Dockerfile
+RUN --mount=type=secret,id=OPENAI_API_KEY,mode=0444,required=true \
 
 # FROM python:3.9-slim
 FROM python:3.11.7-bookworm
