@@ -20,6 +20,8 @@ RUN pip3 install poetry
 RUN poetry config virtualenvs.create false
 RUN poetry install 
 
+RUN poetry run gsutil -m cp -r gs://tense-slate/storage .
+
 EXPOSE 8501
 
 HEALTHCHECK CMD curl --fail http://localhost:8501/_stcore/health
