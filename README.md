@@ -12,6 +12,7 @@ app_port: 8501
 ## Usage 
 Try out the app on Huggingface: https://huggingface.co/spaces/nshern/ft_gpt.
 
+## Install
 Or host the app locally using poetry.
 ```
 git clone https://github.com/nshern/ft_gpt.git
