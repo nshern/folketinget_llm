@@ -1,5 +1,13 @@
-# Folketinget GPT
+---
+title: Folketinget GPT 
+emoji: 🐳
+colorFrom: purple
+colorTo: gray
+sdk: docker
+app_port: 8501
+---
 
+# Folketinget GPT
 
 ## Usage 
 Try out the app on Huggingface: https://huggingface.co/spaces/nshern/ft_gpt.
