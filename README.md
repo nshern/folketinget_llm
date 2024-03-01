@@ -1,5 +1,5 @@
 ---
-title: Basic Docker SDK Space
+title: Folketinget GPT 
 emoji: 🐳
 colorFrom: purple
 colorTo: gray
