@@ -1,15 +1,15 @@
 import os
 import ftplib
 
-# FTP server details
-FTP_HOST = "oda.ft.dk"
-FTP_DIR = "ODAXML/Referat/samling"
-
 FILE_DIR = os.path.dirname(__file__)
 DL_DIR = f"{FILE_DIR}/../data/xml"
 
 
-def extract():
+def extract_via_ftp():
+    # FTP server details
+    FTP_HOST = "oda.ft.dk"
+    FTP_DIR = "ODAXML/Referat/samling"
+
     # Connect to the FTP server
     ftp = ftplib.FTP(FTP_HOST)
     ftp.login()  # login anonymously
