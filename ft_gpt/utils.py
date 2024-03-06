@@ -1,5 +1,6 @@
-from datetime import datetime
 import os
+from datetime import datetime
+
 from ft_gpt import constants, utils
 
 
@@ -24,7 +25,7 @@ def get_date(s: str):
 
 def get_dates_of_sittings(reverse=False):
     dates = []
-    files = os.listdir(constants.DATA_DIR)
+    files = os.listdir(constants.DATA_DIR_TEXT)
 
     for file in files:
         if str(file.title()) == "Overblik.Txt":

@@ -1,11 +1,13 @@
-import os
 import ftplib
+import os
 
-FILE_DIR = os.path.dirname(__file__)
-DL_DIR = f"{FILE_DIR}/../data/xml"
+from ft_gpt import constants
+
+# FILE_DIR = os.path.dirname(__file__)
+# DL_DIR = f"{FILE_DIR}/../data/xml"
 
 
-def extract_via_ftp():
+def extract():
     # FTP server details
     FTP_HOST = "oda.ft.dk"
     FTP_DIR = "ODAXML/Referat/samling"
@@ -23,8 +25,9 @@ def extract_via_ftp():
         # If it does not exist we create it.
         # This give structure to data in downlolad folder.
 
-        dl_folder_path = f"{DL_DIR}/{folder}"
-        if not os.path.exists(dl_folder_path):
+        # dl_folder_path = f"{DL_DIR}/{folder}"
+        dl_folder_path = f"{constants.DATA_DIR_XML}"
+        if not os.path.exists(f"{dl_folder_path}"):
             os.makedirs(dl_folder_path)
             print(f"Folder '{dl_folder_path}' was created.")
 
@@ -56,3 +59,7 @@ def extract_via_ftp():
     print("Closing ftp connection.")
     ftp.quit()
     print("ftp connection closed.")
+
+
+if __name__ == "__main__":
+    extract()

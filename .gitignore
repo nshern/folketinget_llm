@@ -3,3 +3,5 @@ pdf
 xml
 paul_
 __pycache__
+data/xml-backup
+data/.DS_Store
