@@ -1,12 +1,10 @@
 import os
-from ft_gpt import constants
-from ft_gpt.ingest.load_documents import load_docs
-from llama_index.core import (
-    VectorStoreIndex,
-    StorageContext,
-    load_index_from_storage,
-)
+
+from llama_index.core import StorageContext, VectorStoreIndex, load_index_from_storage
 from llama_index.core.node_parser import SimpleNodeParser
+
+from ft_gpt import constants
+from ft_gpt.etl.load import load_docs
 
 
 def parse_nodes(documents):
@@ -16,7 +14,7 @@ def parse_nodes(documents):
     return nodes
 
 
-def create_index():
+def create_index(filetype):
     if os.path.isdir(constants.PERSIST_DIR):
         print("Storage exists")
         print("Loading storage")
@@ -25,7 +23,7 @@ def create_index():
         )
         index = load_index_from_storage(storage_context)
     else:
-        docs = load_docs()
+        docs = load_docs(filetype)
         nodes = parse_nodes(docs)
         print("No storage")
         print("Creating index")

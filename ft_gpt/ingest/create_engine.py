@@ -30,8 +30,8 @@ def generate_pre_promt():
 #     return query_engine
 
 
-def create_engine():
-    index = create_index()
+def create_engine(filetype):
+    index = create_index(filetype)
     system_prompt = generate_pre_promt()
     query_engine = index.as_chat_engine(
         chat_mode="openai",  # type: ignore
