@@ -80,25 +80,47 @@ class ETLPipeline:
 
     def parse_xml(self):
         file = f"{constants.DATA_DIR_XML}20231_M58_helemoedet.xml"
+        res = []
         with open(file, "r") as f:
             xml_data = f.read()
 
-        print(xml_data)
-
         root = ET.fromstring(xml_data)
 
-        for i in root.findall(".//DagsordenPunkt"):
-            for k in i.findall(".//Tale"):
-                speaker_info = k.find(".//Taler/MetaSpeakerMP")
-                if speaker_info is not None:
-                    first_name = speaker_info.find("OratorFirstName").text
-                    last_name = speaker_info.find("OratorLastName").text
-                    role = speaker_info.find("OratorRole").text
-                    group = speaker_info.find("GroupNameShort").text
-                    speaker_name = f"{first_name} {last_name}"
-                    print(f"Speaker: {speaker_name}, Role: {role}, Group: {group}")
+        dagsordenspunkter = root.findall(".//DagsordenPunkt")
+        id = 0
+        for i in dagsordenspunkter:
+            id += 1
+            tale = i.findall(".//Tale")
+            for k in tale:
+                # print(f"{k.find(".//MetaSpeakerMP/OratorFirstName").text} {k.find(".//MetaSpeakerMP/OratorLastName").text}")
+                firstname = k.find(".//Taler/MetaSpeakerMP/OratorFirstName").text
+                lastname = k.find(".//Taler/MetaSpeakerMP/OratorLastName").text
+                # tekstgrupper = k.find_all(k.findall("./"))
+                text = k.findall(".//TaleSegment/TekstGruppe/Exitus/Linea/Char")
+                bar = [i.text for i in text]
+                baz = " ".join(bar)
+                # print(text)
+                l = f"**{firstname} {lastname}**: {baz}\n"
+                res.append(l)
 
-                # TODO: Print what they say!
+        return " ".join(res)
+
+        # for i in root.findall(".//DagsordenPunkt"):
+        #     for k in i.findall(".//Tale"):
+        #         speaker_info = k.find(".//Taler/MetaSpeakerMP")
+        #         if speaker_info is not None:
+        #             first_name = speaker_info.find("OratorFirstName").text
+        #             last_name = speaker_info.find("OratorLastName").text
+        #             role = speaker_info.find("OratorRole").text
+        #             group = speaker_info.find("GroupNameShort").text
+        #             speaker_name = f"{first_name} {last_name}"
+        #             print(f"Speaker: {speaker_name}, Role: {role}, Group: {group}")
+        #         foo = k.find(".//Taler/TaleSegment/TekstGruppe/Exitus/Linea")
+        #         if foo is not None:
+        #             print(foo.find("char").text)
+
+        # TODO: Print what they say!
+
         #
         #     for segment in tale.findall(".//TaleSegment/TekstGruppe/Exitus/Linea"):
         #         speech_text = segment.text
@@ -187,4 +209,5 @@ class ETLPipeline:
 if __name__ == "__main__":
     p = ETLPipeline("")
     foo = p.parse_xml()
-    print(foo)
+    with open("output.md", "w") as f:
+        f.write(foo)

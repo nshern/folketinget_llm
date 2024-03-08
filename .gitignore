@@ -5,3 +5,6 @@ paul_
 __pycache__
 data/xml-backup
 data/.DS_Store
+ft_gpt/etl/output.md
+ft_gpt/etl/output.txt
+ft_gpt/etl/test.xml
