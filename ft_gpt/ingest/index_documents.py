@@ -4,7 +4,7 @@ from llama_index.core import StorageContext, VectorStoreIndex, load_index_from_s
 from llama_index.core.node_parser import SimpleNodeParser
 
 from ft_gpt import constants
-from ft_gpt.etl.load import load_docs
+from ft_gpt.etl.pipeline import ETLPipeline
 
 
 def parse_nodes(documents):
@@ -23,7 +23,9 @@ def create_index(filetype):
         )
         index = load_index_from_storage(storage_context)
     else:
-        docs = load_docs(filetype)
+        p = ETLPipeline()
+        docs = p.transform("text")
+        # docs = load_docs(filetype)
         nodes = parse_nodes(docs)
         print("No storage")
         print("Creating index")
