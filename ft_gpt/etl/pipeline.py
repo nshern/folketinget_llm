@@ -1,5 +1,6 @@
 import ftplib
 import os
+import shutil
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
@@ -9,9 +10,6 @@ from ft_gpt import constants, utils
 
 
 class ETLPipeline:
-    def __init__(self, data_destination):
-        self.data_destination = data_destination
-
     def extract(self):
         """
         This method connects to the oda.ft.dk database via ftp and retrieves all meeting notes
@@ -34,7 +32,7 @@ class ETLPipeline:
             # This give structure to data in downlolad folder.
 
             # dl_folder_path = f"{DL_DIR}/{folder}"
-            dl_folder_path = f"{constants.DATA_DIR_XML}"
+            dl_folder_path = f"{constants.DATA_DIR_XML_RAW}"
             if not os.path.exists(f"{dl_folder_path}"):
                 os.makedirs(dl_folder_path)
                 print(f"Folder '{dl_folder_path}' was created.")
@@ -78,12 +76,10 @@ class ETLPipeline:
             with open(overview_path, "a") as f:
                 f.write(f"{i}, {utils.convert_date(i)}\n")
 
-    def parse_xml(self):
-        file = f"{constants.DATA_DIR_XML}20231_M58_helemoedet.xml"
+    def parse_xml(self, file):
         res = []
         with open(file, "r") as f:
             xml_data = f.read()
-
         root = ET.fromstring(xml_data)
 
         dagsordenspunkter = root.findall(".//DagsordenPunkt")
@@ -93,60 +89,37 @@ class ETLPipeline:
             tale = i.findall(".//Tale")
             for k in tale:
                 # print(f"{k.find(".//MetaSpeakerMP/OratorFirstName").text} {k.find(".//MetaSpeakerMP/OratorLastName").text}")
-                firstname = k.find(".//Taler/MetaSpeakerMP/OratorFirstName").text
-                lastname = k.find(".//Taler/MetaSpeakerMP/OratorLastName").text
+                firstname = k.find(".//Taler/MetaSpeakerMP/OratorFirstName")
+                if firstname is not None:
+                    firstname = firstname.text
+                lastname = k.find(".//Taler/MetaSpeakerMP/OratorLastName")
+                if lastname is not None:
+                    lastname = lastname.text
                 # tekstgrupper = k.find_all(k.findall("./"))
-                text = k.findall(".//TaleSegment/TekstGruppe/Exitus/Linea/Char")
-                bar = [i.text for i in text]
-                baz = " ".join(bar)
-                # print(text)
-                l = f"**{firstname} {lastname}**: {baz}\n"
-                res.append(l)
+                text_snippet = k.findall(".//TaleSegment/TekstGruppe/Exitus/Linea/Char")
+                text = " ".join([i.text for i in text_snippet if i.text is not None])
+                line = f"**{firstname} {lastname}**: {text}\n"
+                res.append(line)
 
         return " ".join(res)
 
-        # for i in root.findall(".//DagsordenPunkt"):
-        #     for k in i.findall(".//Tale"):
-        #         speaker_info = k.find(".//Taler/MetaSpeakerMP")
-        #         if speaker_info is not None:
-        #             first_name = speaker_info.find("OratorFirstName").text
-        #             last_name = speaker_info.find("OratorLastName").text
-        #             role = speaker_info.find("OratorRole").text
-        #             group = speaker_info.find("GroupNameShort").text
-        #             speaker_name = f"{first_name} {last_name}"
-        #             print(f"Speaker: {speaker_name}, Role: {role}, Group: {group}")
-        #         foo = k.find(".//Taler/TaleSegment/TekstGruppe/Exitus/Linea")
-        #         if foo is not None:
-        #             print(foo.find("char").text)
+    def parse_all_xml(self):
+        try:
+            shutil.rmtree(constants.DATA_DIR_XML_PARSED)
+            print(f"Directory '{constants.DATA_DIR_XML_PARSED}' has been removed")
+        except OSError as error:
+            print(f"Error: {error.strerror}")
 
-        # TODO: Print what they say!
+        if not os.path.exists(constants.DATA_DIR_XML_PARSED):
+            os.makedirs(constants.DATA_DIR_XML_PARSED)
 
-        #
-        #     for segment in tale.findall(".//TaleSegment/TekstGruppe/Exitus/Linea"):
-        #         speech_text = segment.text
-        #         if speech_text:
-        #             print(f"Speech: {speech_text}")
-        #
-        #     print("-----")
-
-        # for i in root.findall(".//DagsordenPunkt"):
-        #     id = i.find(".//MetaFTAgendaItem/ItemNo")
-        #     print(id.text)
-        # print(id.text)
-        # if speaker_info is not None:
-        #     first_name = speaker_info.find("OratorFirstName").text
-        #     last_name = speaker_info.find("OratorLastName").text
-        #     role = speaker_info.find("OratorRole").text
-        #     group = speaker_info.find("GroupNameShort").text
-        #     speaker_name = f"{first_name} {last_name}"
-        #     print(f"Speaker: {speaker_name}, Role: {role}, Group: {group}")
-        #
-        # for segment in tale.findall(".//TaleSegment/TekstGruppe/Exitus/Linea"):
-        #     speech_text = segment.text
-        #     if speech_text:
-        #         print(f"Speech: {speech_text}")
-        #
-        # print("-----")
+        files = os.listdir(constants.DATA_DIR_XML_RAW)
+        for file in files:
+            parsed_file_title = f"{constants.DATA_DIR_XML_PARSED}{file}.md"
+            parsed = self.parse_xml(f"{constants.DATA_DIR_XML_RAW}{file}")
+            with open(parsed_file_title, "w") as f:
+                f.write(parsed)
+                print(f"Parsed {parsed_file_title}")
 
     def transform(self, filetype):
         print("Loading documents...")
@@ -202,12 +175,4 @@ class ETLPipeline:
     def run(self):
         self.extract()
         self.generate_overview_doc()
-        self.transform("xml")
-        self.load()
-
-
-if __name__ == "__main__":
-    p = ETLPipeline("")
-    foo = p.parse_xml()
-    with open("output.md", "w") as f:
-        f.write(foo)
+        self.parse_all_xml()
