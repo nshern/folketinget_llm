@@ -24,7 +24,7 @@ def create_index(filetype):
         index = load_index_from_storage(storage_context)
     else:
         p = ETLPipeline()
-        docs = p.transform("text")
+        docs = p.transform()
         # docs = load_docs(filetype)
         nodes = parse_nodes(docs)
         print("No storage")

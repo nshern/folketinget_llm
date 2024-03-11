@@ -76,7 +76,7 @@ class ETLPipeline:
             with open(overview_path, "a") as f:
                 f.write(f"{i}, {utils.convert_date(i)}\n")
 
-    def parse_xml(self, file):
+    def _parse_xml(self, file):
         res = []
         with open(file, "r") as f:
             xml_data = f.read()
@@ -103,7 +103,8 @@ class ETLPipeline:
 
         return " ".join(res)
 
-    def parse_all_xml(self):
+    # TODO: Should check if data is already parsed
+    def _parse_all_xml(self):
         try:
             shutil.rmtree(constants.DATA_DIR_XML_PARSED)
             print(f"Directory '{constants.DATA_DIR_XML_PARSED}' has been removed")
@@ -116,54 +117,50 @@ class ETLPipeline:
         files = os.listdir(constants.DATA_DIR_XML_RAW)
         for file in files:
             parsed_file_title = f"{constants.DATA_DIR_XML_PARSED}{file}.md"
-            parsed = self.parse_xml(f"{constants.DATA_DIR_XML_RAW}{file}")
+            parsed = self._parse_xml(f"{constants.DATA_DIR_XML_RAW}{file}")
             with open(parsed_file_title, "w") as f:
                 f.write(parsed)
                 print(f"Parsed {parsed_file_title}")
 
-    def transform(self, filetype):
+    def _read_documents(self):
         print("Loading documents...")
         """
         Read text files used for the llm
         """
 
-        if filetype not in ["pdf", "xml", "text"]:
-            raise ValueError(
-                f"Unsupported type: {filetype}. Type must be one of 'pdf', 'xml' or 'text'"
-            )
+        data_dir = f"{os.path.dirname(constants.FILE_DIR)}/data/xml/parsed/"
 
-        data_dir = f"{os.path.dirname(constants.FILE_DIR)}/data/{filetype}/"
+        documents = []
+        files = os.listdir(data_dir)
 
-        if filetype == "text":
-            documents = []
-            files = os.listdir(data_dir)
+        print("Reading files")
+        for file in files:
+            try:
+                date = utils.get_date(file)
+            except Exception as e:
+                print(f"No date were found for file: {file}: {e}")
+                date = ""
+            date_of_sitting = f"[Afholdelsestidspunkt for møde: {date}]"
+            with open(f"{data_dir}{file}") as f:
+                text = f.read()
 
-            print("Reading files")
-            for file in files:
-                try:
-                    date = utils.get_date(file)
-                except Exception as e:
-                    print(f"No date were found for file: {file}: {e}")
-                    date = ""
-                date_of_sitting = f"[Afholdelsestidspunkt for møde: {date}]"
-                with open(f"{data_dir}{file}") as f:
-                    text = f.read()
+            title = file.split(".pdf.txt")[0]
+            if title.startswith("dk_forhandlinger"):
+                url = f"https://www.ft.dk/forhandlinger/{title.split('_', 3)[2]}/{title.split('_', 3)[3]}.htm"
+            else:
+                url = ""
+            document = Document(text=text, metadata={"title": title, "date": f"[{date_of_sitting}]", "url": url})  # type: ignore
+            documents.append(document)
 
-                title = file.split(".pdf.txt")[0]
-                if title.startswith("dk_forhandlinger"):
-                    url = f"https://www.ft.dk/forhandlinger/{title.split('_', 3)[2]}/{title.split('_', 3)[3]}.htm"
-                else:
-                    url = ""
-                document = Document(text=text, metadata={"title": title, "date": f"[{date_of_sitting}]", "url": url})  # type: ignore
-                documents.append(document)
+        return documents
 
-            return documents
+    def _read_nodes(self):
+        # TODO: Check if self.docs exists
+        docs = self.docs
 
-        if filetype == "xml":
-            pass
-
-        if filetype == "pdf":
-            pass
+    def transform(self):
+        self._parse_all_xml()
+        self.docs = self._read_documents()
 
     def load(self):
         """
@@ -175,4 +172,10 @@ class ETLPipeline:
     def run(self):
         self.extract()
         self.generate_overview_doc()
-        self.parse_all_xml()
+        self.transform()
+
+
+if __name__ == "__main__":
+    p = ETLPipeline()
+    p.transform()
+    print(p.docs)
