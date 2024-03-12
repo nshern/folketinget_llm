@@ -10,6 +10,8 @@ from ft_gpt.etl.pipeline import ETLPipeline
 def parse_nodes(documents):
     node_parser = SimpleNodeParser.from_defaults(chunk_size=1024)
     nodes = node_parser.get_nodes_from_documents(documents)
+    print(type(nodes))
+    breakpoint()
 
     return nodes
 
