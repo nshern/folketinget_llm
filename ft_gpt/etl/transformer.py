@@ -2,9 +2,6 @@ import os
 import shutil
 import xml.etree.ElementTree as ET
 
-from llama_index.core import StorageContext, VectorStoreIndex, load_index_from_storage
-from llama_index.core.schema import NodeRelationship, RelatedNodeInfo, TextNode
-
 from ft_gpt import constants
 
 
@@ -64,73 +61,8 @@ class Transformer:
                 f.write(parsed)
                 print(f"Parsed {parsed_file_title}")
 
-    def _extract_data_from_parsed_files(self):
-        print("Parsing data...")
-        files = os.listdir(constants.DATA_DIR_XML_RAW)
-        docs = {}
-        for file in files:
-            docs[file] = {}
-            abs_file_raw = f"{constants.DATA_DIR_XML_RAW}{file}"
-            date = self._extract_date_from_xml(abs_file_raw)
-            docs[file]["date"] = date
-
-            abs_file_parsed = f"{constants.DATA_DIR_XML_PARSED}{file}.md"
-            with open(abs_file_parsed) as f:
-                text = f.read()
-                docs[file]["text"] = text
-
-        print("Finished parsing data..")
-        return docs
-
-    # NOTE: This part and down should probably go into load
-    def _create_nodes(self):
-        self._parse_raw_xml_files()
-        nodes = []
-        current_id = 0
-        docs = self._extract_data_from_parsed_files()
-
-        print("Creating nodes..")
-        for key, val in docs.items():
-            lines = val["text"].split("\n")
-            for line in lines:
-                speaker = str(line.split(":", 1)[0]).replace("**", "")
-                content = line.split(":", 1)[-1]
-                file = str(key).split(".")[0]
-                date = val["date"]
-                node = TextNode(
-                    text=content,
-                    metadata={"speaker": speaker, "date": date, "file": file},  # type: ignore
-                )
-
-                current_id = current_id + 1
-                node.id_ = str(current_id)
-
-                # TODO: Add node relationships
-
-                nodes.append(node)
-
-            self.nodes = nodes
-
-    def _create_index(self):
-        if os.path.isdir(constants.PERSIST_DIR):
-            print("Storage exists")
-            print("Loading storage")
-            storage_context = StorageContext.from_defaults(
-                persist_dir=constants.PERSIST_DIR
-            )
-            self.index = load_index_from_storage(storage_context)
-        else:
-            nodes = self.nodes
-            print("No storage")
-            print("Creating index")
-            index = VectorStoreIndex(nodes)
-            self.index = index.storage_context.persist(
-                persist_dir=constants.PERSIST_DIR
-            )
-
     def run(self):
-        self._create_nodes()
-        self._create_index
+        self._parse_raw_xml_files()
 
 
 if __name__ == "__main__":

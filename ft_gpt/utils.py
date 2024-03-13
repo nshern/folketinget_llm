@@ -1,4 +1,5 @@
 import os
+import xml.etree.ElementTree as ET
 from datetime import datetime
 
 from ft_gpt import constants, utils
@@ -6,6 +7,18 @@ from ft_gpt import constants, utils
 
 def get_current_date():
     return datetime.now().isoformat().split("T")[0]
+
+
+def extract_date_from_xml(file):
+    res = []
+    with open(file, "r") as f:
+        xml_data = f.read()
+    root = ET.fromstring(xml_data)
+
+    dates = root.findall(".//DateOfSitting")
+    res = dates[0].text
+
+    return res
 
 
 def convert_date(date_str):
