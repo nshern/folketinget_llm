@@ -1,12 +1,6 @@
 import os
 
-from llama_index.core import (
-    ServiceContext,
-    StorageContext,
-    VectorStoreIndex,
-    load_index_from_storage,
-    service_context,
-)
+from llama_index.core import StorageContext, VectorStoreIndex, load_index_from_storage
 from llama_index.core.schema import NodeRelationship, RelatedNodeInfo, TextNode
 from llama_index.core.settings import Settings
 from llama_index.embeddings.openai import OpenAIEmbedding
@@ -42,8 +36,11 @@ class Loader:
 
         print("Creating nodes..")
         for key, val in docs.items():
+            # TODO: Make a straighting method
             lines = val["text"].split("\n")
             for line in lines:
+                print(utils.get_token_amount(line))
+                # TODO: Split text and put speaker in front again.
                 speaker = str(line.split(":", 1)[0]).replace("**", "").strip()
                 content = line.split(":", 1)[-1].strip()
                 file = str(key).split(".")[0].strip()
@@ -76,9 +73,6 @@ class Loader:
             model="gpt-4-0125-preview",
             temperature=0.7,
             max_tokens=128000,  # Adjust based on your needs, up to the model's limit
-            api_key="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",
-            api_base="https://api.openai.com",
-            api_version="v1",
         )
         Settings.llm = openai_llm
         Settings.embed_model = OpenAIEmbedding(model="text-embedding-3-large")
@@ -99,7 +93,7 @@ class Loader:
     def run(self):
         # print(Settings.llm)
         self._create_nodes()
-        self._create_index()
+        # self._create_index()
 
 
 if __name__ == "__main__":

@@ -70,3 +70,11 @@ def get_token_amount(text):
 # TODO: write summarization function: https://huggingface.co/docs/transformers/tasks/summarization
 def summarize_text():
     pass
+
+
+# TODO: Use tiktoken to chunck text
+def split_text(text):
+    split_text = text.split(" ")
+    half = len(split_text) / 2
+
+    return [" ".join(split_text[0 : int(half)]), " ".join(split_text[int(half) :])]
