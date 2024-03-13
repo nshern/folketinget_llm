@@ -72,6 +72,16 @@ class Loader:
             self.nodes = nodes
 
     def _create_index(self):
+        openai_llm = OpenAI(
+            model="gpt-4-0125-preview",
+            temperature=0.7,
+            max_tokens=128000,  # Adjust based on your needs, up to the model's limit
+            api_key="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",
+            api_base="https://api.openai.com",
+            api_version="v1",
+        )
+        Settings.llm = openai_llm
+        Settings.embed_model = OpenAIEmbedding(model="text-embedding-3-large")
         if os.path.isdir(constants.PERSIST_DIR):
             print("Storage exists")
             print("Loading storage")
@@ -87,11 +97,7 @@ class Loader:
             index.storage_context.persist(persist_dir=constants.PERSIST_DIR)
 
     def run(self):
-        Settings.llm = OpenAI(
-            model="gpt-4-0125-preview", temperature=0.1, max_tokens=512
-        )
-        Settings.embed_model = OpenAIEmbedding(model="text-embedding-3-large")
-        print(Settings.llm)
+        # print(Settings.llm)
         self._create_nodes()
         self._create_index()
 

@@ -2,6 +2,9 @@ import os
 import xml.etree.ElementTree as ET
 from datetime import datetime
 
+import tiktoken
+from openai import OpenAI
+
 from ft_gpt import constants, utils
 
 
@@ -57,3 +60,13 @@ def get_dates_of_sittings(reverse=False):
     sorted_dates = [datetime.strftime(date, "%Y-%m-%d") for date in date_objects]
 
     return sorted_dates
+
+
+def get_token_amount(text):
+    encoding = tiktoken.encoding_for_model("text-embedding-3-large")
+    return len(encoding.encode(text))
+
+
+# TODO: write summarization function: https://huggingface.co/docs/transformers/tasks/summarization
+def summarize_text():
+    pass
