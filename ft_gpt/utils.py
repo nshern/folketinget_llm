@@ -72,9 +72,31 @@ def summarize_text():
     pass
 
 
-# TODO: Use tiktoken to chunck text
-def split_text(text):
-    split_text = text.split(" ")
-    half = len(split_text) / 2
+def split_text(text, max_length=8191):
+    """
+    Splits the text into chunks of a maximum length.
+    If the text is shorter than the max_length, it returns the text as is.
+    If the text is longer, it splits it into smaller chunks of equal length,
+    ensuring each chunk is under the max_length.
+    """
+    # Check if the current text is under the maximum length
+    if get_token_amount(text) <= max_length:
+        return text
 
-    return [" ".join(split_text[0 : int(half)]), " ".join(split_text[int(half) :])]
+    # If the text is longer than the max_length, split it into two halves
+    half_length = len(text) // 2
+    first_half = text[:half_length]
+    second_half = text[half_length:]
+
+    # Recursively split the halves if they are still too long
+    split_first_half = split_text(first_half, max_length)
+    split_second_half = split_text(second_half, max_length)
+
+    # If the result of the split is not a list, make it a list
+    if not isinstance(split_first_half, list):
+        split_first_half = [split_first_half]
+    if not isinstance(split_second_half, list):
+        split_second_half = [split_second_half]
+
+    # Combine the lists from both halves and return
+    return split_first_half + split_second_half

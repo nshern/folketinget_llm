@@ -1,7 +1,7 @@
 from ft_gpt import utils
+from ft_gpt.etl.loader import Loader
 
 # from llama_index.core.memory import ChatMemoryBuffer
-from ft_gpt.ingest.index_documents import create_index
 
 
 def generate_pre_promt():
@@ -30,8 +30,10 @@ def generate_pre_promt():
 #     return query_engine
 
 
-def create_engine(filetype):
-    index = create_index(filetype)
+def create_engine():
+    loader = Loader()
+    loader.run()
+    index = loader.index
     system_prompt = generate_pre_promt()
     query_engine = index.as_chat_engine(
         chat_mode="openai",  # type: ignore

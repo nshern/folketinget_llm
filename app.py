@@ -60,7 +60,7 @@ if prompt:
         st.write(prompt)
     with st.spinner("Tænker..."):
         response = st.session_state.chat_engine.chat(prompt)
-        references = [i.metadata["url"] for i in response.source_nodes]
+        references = [i.metadata["file"] for i in response.source_nodes]
     with st.chat_message(name="LLM"):
         enhanced_response = f"{response.response}\n"
         if references != []:

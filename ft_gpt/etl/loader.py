@@ -28,6 +28,22 @@ class Loader:
         print("Finished parsing data..")
         return docs
 
+    def _create_node(self, content, speaker, file, date, id):
+        token_amount = utils.get_token_amount(content)
+
+        node = TextNode(
+            text=content,
+            metadata={"speaker": speaker, "date": date, "file": file},  # type: ignore
+        )
+
+        node.id_ = str(id)
+
+        node.relationships[NodeRelationship.NEXT] = RelatedNodeInfo(node_id=str(id + 1))
+        node.relationships[NodeRelationship.PREVIOUS] = RelatedNodeInfo(
+            node_id=str(id - 1)
+        )
+        return node
+
     # TODO: Set date range parameter
     def _create_nodes(self):
         nodes = []
@@ -36,11 +52,8 @@ class Loader:
 
         print("Creating nodes..")
         for key, val in docs.items():
-            # TODO: Make a straighting method
             lines = val["text"].split("\n")
             for line in lines:
-                print(utils.get_token_amount(line))
-                # TODO: Split text and put speaker in front again.
                 speaker = str(line.split(":", 1)[0]).replace("**", "").strip()
                 content = line.split(":", 1)[-1].strip()
                 file = str(key).split(".")[0].strip()
@@ -49,22 +62,34 @@ class Loader:
                 # NOTE: Hacked filtering on date range
                 # NOTE: Filtered should occur before this point
                 if str(date).startswith("2023"):
-                    node = TextNode(
-                        text=content,
-                        metadata={"speaker": speaker, "date": date, "file": file},  # type: ignore
-                    )
 
-                    current_id = current_id + 1
-                    node.id_ = str(current_id)
+                    token_amount = utils.get_token_amount(content)
 
-                    node.relationships[NodeRelationship.NEXT] = RelatedNodeInfo(
-                        node_id=str(current_id + 1)
-                    )
-                    node.relationships[NodeRelationship.PREVIOUS] = RelatedNodeInfo(
-                        node_id=str(current_id - 1)
-                    )
+                    if token_amount >= 8191:
+                        print("Splitting chunk...")
+                        print(token_amount)
+                        content_chunks = utils.split_text(content)
+                        for chunk in content_chunks:
+                            node = self._create_node(
+                                content=chunk,
+                                speaker=speaker,
+                                file=file,
+                                date=date,
+                                id=current_id,
+                            )
 
-                    nodes.append(node)
+                            nodes.append(node)
+
+                    else:
+                        node = self._create_node(
+                            content=content,
+                            speaker=speaker,
+                            file=file,
+                            date=date,
+                            id=current_id,
+                        )
+
+                        nodes.append(node)
 
             self.nodes = nodes
 
@@ -72,7 +97,6 @@ class Loader:
         openai_llm = OpenAI(
             model="gpt-4-0125-preview",
             temperature=0.7,
-            max_tokens=128000,  # Adjust based on your needs, up to the model's limit
         )
         Settings.llm = openai_llm
         Settings.embed_model = OpenAIEmbedding(model="text-embedding-3-large")
@@ -87,13 +111,15 @@ class Loader:
             nodes = self.nodes
             print("No storage")
             print("Creating index")
-            index = VectorStoreIndex(nodes=nodes)
+            index = VectorStoreIndex(nodes=nodes, show_progress=True)
             index.storage_context.persist(persist_dir=constants.PERSIST_DIR)
+            self.index = index
 
     def run(self):
         # print(Settings.llm)
         self._create_nodes()
-        # self._create_index()
+        self._create_index()
+        # TODO : Create method that pushes vectorstore to remote storage
 
 
 if __name__ == "__main__":
