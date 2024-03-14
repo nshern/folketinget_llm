@@ -9,6 +9,7 @@ from llama_index.llms.openai import OpenAI
 from ft_gpt import constants, settings, utils
 
 
+# TODO: Create different types of loaders...
 class Loader:
     def _extract_data(self):
         print("Parsing data...")
