@@ -18,25 +18,12 @@ def generate_pre_promt():
     return prompt
 
 
-# def create_engine():
-#     index = create_index()
-#     memory = ChatMemoryBuffer.from_defaults()
-#     system_prompt = generate_pre_promt()
-#     query_engine = index.as_chat_engine(
-#         chat_mode="context",  # type: ignore
-#         memory=memory,
-#         system_prompt=system_prompt,
-#     )
-#     return query_engine
-
-
 def create_engine():
     loader = Loader()
     loader.run()
     index = loader.index
     system_prompt = generate_pre_promt()
     query_engine = index.as_chat_engine(
-        chat_mode="openai",  # type: ignore
-        system_prompt=system_prompt,
+        chat_mode="openai", system_prompt=system_prompt, verbose=True  # type: ignore
     )
     return query_engine

@@ -109,6 +109,7 @@ class Loader:
             )
             self.index = load_index_from_storage(storage_context)
         else:
+            self._create_nodes()
             nodes = self.nodes
             print("No storage")
             print("Creating index")
@@ -118,7 +119,6 @@ class Loader:
 
     def run(self):
         # print(Settings.llm)
-        self._create_nodes()
         self._create_index()
         # TODO : Create method that pushes vectorstore to remote storage
 

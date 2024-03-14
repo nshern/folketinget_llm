@@ -1,4 +1,4 @@
-from ft_gpt.ingest.create_engine import create_engine
+from ft_gpt.engine.create_engine import create_engine
 from ft_gpt.settings import init_settings
 
 if __name__ == "__main__":
@@ -14,4 +14,6 @@ if __name__ == "__main__":
             query_engine.reset()
         else:
             r = query_engine.chat(query)
-            print(r.response)
+            print(f"response:{r.response}\n")
+            print(f"sources: {r.sources}\n")
+            print(f"source_nodes: {r.source_nodes}\n")
